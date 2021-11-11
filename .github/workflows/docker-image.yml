@@ -28,7 +28,8 @@ jobs:
       name: Build Docker image
       run: docker build . --tag ghcr.io/a-sinkavets/bitcoin:0.21.0
     -
-      name: Scan image
+      name: Vulnerability Scan
+      id: scan
       uses: sysdiglabs/scan-action@v1
       with:
         image-tag: ghcr.io/a-sinkavets/bitcoin:0.21.0
