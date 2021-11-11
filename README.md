@@ -1,10 +1,5 @@
-## Prerequisites
+## Bitcoin Core version 0.21.0
 
-- docker
-- grype (https://github.com/anchore/grype)
-
-Build image
-`docker build . -t alek/bitcoin:0.21.0`
-
-Vulnerability scan
-`grype alek/bitcoin:0.21.0 --only-fixed --quiet`
+- Docker Image building withing GitHub Action
+- Sysdig vulnerability scanner
+- Pushing image to Github Container registry
