@@ -33,7 +33,6 @@ jobs:
     - name: Build Docker image
       run: |
         docker build . --tag ghcr.io/a-sinkavets/bitcoin:0.21.0
-        docker run ghcr.io/a-sinkavets/bitcoin:0.21.0
         docker push ghcr.io/a-sinkavets/bitcoin:0.21.0
     #
     # - name: Build and push
