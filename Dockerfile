@@ -22,4 +22,4 @@ RUN wget https://bitcoincore.org/bin/bitcoin-core-${VERSION}/bitcoin-${VERSION}-
 VOLUME ["/home/bitcoin/.bitcoin"]
 EXPOSE 8332 8333 18332 18333 18443 18444 38333 38332
 
-CMD ["sh","-c", "bitcoind -daemon -debuglogfile=/var/log/bitcoind.log && tail -f /var/log/bitcoind.log"]
+CMD ["sh","-c", "bitcoind -daemon -debuglogfile=/var/log/bitcoind.log && sleep 3 && tail -f /var/log/bitcoind.log"]
