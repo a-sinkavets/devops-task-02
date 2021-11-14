@@ -1,52 +1,3 @@
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnet_ids" "subnets" {
-  vpc_id = data.aws_vpc.default.id
-}
-
-resource "aws_efs_file_system" "fs" {
-  creation_token = "my-product"
-  encrypted = true
-}
-
-resource "aws_efs_access_point" "access_point" {
-  file_system_id = aws_efs_file_system.fs.id
-}
-
-resource "aws_efs_file_system_policy" "policy" {
-  file_system_id = aws_efs_file_system.fs.id
-
-  bypass_policy_lockout_safety_check = true
-
-  policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Id": "ExamplePolicy01",
-    "Statement": [
-        {
-            "Sid": "ExampleStatement01",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "*"
-            },
-            "Resource": "${aws_efs_file_system.fs.arn}",
-            "Action": [
-                "elasticfilesystem:ClientMount",
-                "elasticfilesystem:ClientWrite"
-            ],
-            "Condition": {
-                "Bool": {
-                    "aws:SecureTransport": "true"
-                }
-            }
-        }
-    ]
-}
-POLICY
-}
-
 resource "aws_ecs_cluster" "cluster-01" {
   name = "cluster-01"
   capacity_providers = [ "FARGATE", "FARGATE_SPOT" ]
@@ -104,22 +55,27 @@ resource "aws_ecs_task_definition" "task-01" {
       }
     ])
 
-  ## Stil in developing ##
-  # volume {
-  #   name = "myEfsVol"
-  #   efs_volume_configuration {
-  #     file_system_id          = aws_efs_file_system.fs.id
-  #     transit_encryption      = "ENABLED"
-  #     transit_encryption_port = 2999
-  #     authorization_config {
-  #       access_point_id = aws_efs_access_point.access_point.id
-  #       iam             = "DISABLED"
-  #     }
-  #   }
-  # }
+  volume {
+    name = "myEfsVol"
+    efs_volume_configuration {
+      file_system_id          = aws_efs_file_system.fs.id
+      root_directory          = "/opt/data"
+      authorization_config {
+        iam             = "DISABLED"
+      }
+    }
+  }
 }
 
 resource "aws_ecs_service" "service-01" {
+  depends_on = [
+    aws_efs_mount_target.mount_us_east_1a,
+    aws_efs_mount_target.mount_us_east_1b,
+    aws_efs_mount_target.mount_us_east_1c,
+    aws_efs_mount_target.mount_us_east_1d,
+    aws_efs_mount_target.mount_us_east_1e,
+    aws_efs_mount_target.mount_us_east_1f
+  ]
   name            = "service-01"
   cluster         = aws_ecs_cluster.cluster-01.id
   task_definition = aws_ecs_task_definition.task-01.arn
