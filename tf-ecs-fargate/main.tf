@@ -1,3 +1,11 @@
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnet_ids" "subnets" {
+  vpc_id = data.aws_vpc.default.id
+}
+
 resource "aws_efs_file_system" "fs" {
   creation_token = "my-product"
   encrypted = true
@@ -96,26 +104,19 @@ resource "aws_ecs_task_definition" "task-01" {
       }
     ])
 
-  volume {
-    name = "myEfsVol"
-    efs_volume_configuration {
-      file_system_id          = aws_efs_file_system.fs.id
-      transit_encryption      = "ENABLED"
-      transit_encryption_port = 2999
-      authorization_config {
-        access_point_id = aws_efs_access_point.access_point.id
-        iam             = "DISABLED"
-      }
-    }
-  }
-}
-
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnet_ids" "subnets" {
-  vpc_id = data.aws_vpc.default.id
+  ## Stil in developing ##
+  # volume {
+  #   name = "myEfsVol"
+  #   efs_volume_configuration {
+  #     file_system_id          = aws_efs_file_system.fs.id
+  #     transit_encryption      = "ENABLED"
+  #     transit_encryption_port = 2999
+  #     authorization_config {
+  #       access_point_id = aws_efs_access_point.access_point.id
+  #       iam             = "DISABLED"
+  #     }
+  #   }
+  # }
 }
 
 resource "aws_ecs_service" "service-01" {
